@@ -1,0 +1,23 @@
+{
+    "name": "ddmytruk/yii2-websocket",
+    "description": "Yii2 websocket extension",
+    "keywords": ["yii2", "yii2-websocket"],
+    "type": "yii2-extension",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dmytro Dmytruk",
+            "email": "d.dmytruk@icloud.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "yiisoft/yii2": "^2.0.0"
+    },
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "ddmytruk\\websocket\\": ""
+        }
+    }
+}
