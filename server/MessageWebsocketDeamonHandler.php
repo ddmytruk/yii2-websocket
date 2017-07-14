@@ -35,13 +35,12 @@ class MessageWebsocketDeamonHandler extends Daemon {
 
 
         $this->userIds[$connectionId] = $getData['userId'];
-//        echo PHP_EOL;
-//        print_r($getData);
-//        echo PHP_EOL;
-//        print_r($this->chanels);
-//        echo PHP_EOL;
-//        print_r($this->userIds);
-//        echo PHP_EOL;
+        echo PHP_EOL;
+        print_r('onOpen');
+        echo PHP_EOL;
+        print_r($this->chanels);
+        echo PHP_EOL;
+        echo PHP_EOL;
     }
 
     protected function onClose($connectionId) {
@@ -50,12 +49,27 @@ class MessageWebsocketDeamonHandler extends Daemon {
             'connectionId' => $connectionId,
         ]);
 
+//        echo PHP_EOL;
+//        print_r('onClose');
+//        echo PHP_EOL;
+//        print_r($this->chanels);
+//        echo PHP_EOL;
+//        print_r($connectionId);
+//        echo PHP_EOL;
+//        echo PHP_EOL;
+
         unset($this->userIds[$connectionId]);
         foreach ($this->chanels as $key => $value) {
-            if(count($this->chanels[$key]))
+            if($this->chanels[$key] == $connectionId && count($this->chanels[$key]) == 1) {
                 unset($this->chanels[$key]);
-            else
-                unset($this->chanels[$key][$connectionId]);
+            }
+            else {
+                foreach ($this->chanels[$key] as $channelKey => $cnannelValue) {
+                    if($channelKey == $connectionId) {
+                        unset($this->chanels[$key][$channelKey]);
+                    }
+                }
+            }
         }
 
         WSEvent::afterClose($this, [
@@ -64,14 +78,14 @@ class MessageWebsocketDeamonHandler extends Daemon {
 
     }
 
-    private function doSome($data) {
+    private function doSome($data, $connectionId) {
         #\Yii::$app->language = 'en';
-        echo PHP_EOL;
-        print_r(\Yii::$app->language);
-        echo PHP_EOL;
-        print_r(Url::to(['/site/index']));
-        echo PHP_EOL;
-        echo PHP_EOL;
+//        echo PHP_EOL;
+//        print_r(\Yii::$app->language);
+//        echo PHP_EOL;
+//        print_r(Url::to(['/site/index']));
+//        echo PHP_EOL;
+//        echo PHP_EOL;
 
         $objData = json_decode($data);
         $sdata   = $objData->data;
@@ -82,18 +96,24 @@ class MessageWebsocketDeamonHandler extends Daemon {
 
         $resultData = WSEvent::somethingToDo($channel, $type, $sdata);
 
-        echo PHP_EOL;
-        print_r($resultData);
-        echo PHP_EOL;
+//        echo PHP_EOL;
+//        print_r('doSome');
+//        echo PHP_EOL;
+//        print_r($resultData);
+//        echo PHP_EOL;
+//        print_r($channel);
+//        echo PHP_EOL;
+//        echo PHP_EOL;
 
         if(isset($this->chanels[$channel])) {
             foreach ($this->chanels[$channel] as $key => $value) {
-                echo PHP_EOL;
-                print_r($resultData);
-                echo PHP_EOL;
-                $this->sendToClient($key, $resultData);
+                if($resultData['dataForRecender'] !== null)
+                    $this->sendToClient($key, json_encode($resultData['dataForRecender']));
             }
         }
+
+        if($resultData['dataForSender'] !== null)
+            $this->sendToClient($connectionId, json_encode($resultData['dataForSender']));
     }
 
     protected function onMessage($connectionId, $data, $type) {
@@ -101,14 +121,28 @@ class MessageWebsocketDeamonHandler extends Daemon {
         if (!strlen($data)) {
             return;
         }
-        $this->doSome($data);
+
+        echo PHP_EOL;
+        print_r('onMessage');
+        echo PHP_EOL;
+        print_r($connectionId);
+        #print_r($this->chanels);
+        echo PHP_EOL;
+        echo PHP_EOL;
+
+        $this->doSome($data, $connectionId);
     }
 
     protected function onServiceMessage($connectionId, $data) {
         if (!strlen($data)) {
             return;
         }
-        $this->doSome($data);
+
+        echo PHP_EOL;
+        print_r($connectionId);
+        echo PHP_EOL;
+
+        $this->doSome($data, $connectionId);
 
     }
 }
