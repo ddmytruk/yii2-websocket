@@ -80,9 +80,15 @@ class Server {
     public function stop() {
         $pid = @file_get_contents($this->config['pid']);
         if ($pid) {
-            posix_kill($pid, SIGTERM);
+            posix_kill($pid, (int)SIGKILL);
+
             for ($i=0;$i=10;$i++) {
                 sleep(1);
+                echo PHP_EOL;
+                print_r($pid);
+                echo PHP_EOL;
+                #print_r(posix_getpgid($pid));
+                echo PHP_EOL;
 
                 if (!posix_getpgid($pid)) {
                     unlink($this->config['pid']);
