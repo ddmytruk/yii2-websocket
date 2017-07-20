@@ -13,10 +13,9 @@ abstract class Daemon extends Generic {
     protected $pid;
     private $_handshakes = array();
 
-    public function __construct($server, $service, $master) {
+    public function __construct($server, $service) {
         $this->_server = $server;
         $this->_service = $service;
-        $this->_master = $master;
         $this->pid = posix_getpid();
     }
 

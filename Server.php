@@ -55,21 +55,11 @@ class Server {
             }
         }
 
-        if (!empty($this->config['master'])) {
-            //create a socket for the processing of messages from slaves
-            $master = stream_socket_client($this->config['master'], $errorNumber, $errorString);
-            stream_set_blocking($master, 0);
-
-            if (!$master) {
-                die("error: stream_socket_client: $errorString ($errorNumber)\r\n");
-            }
-        }
-
         file_put_contents($this->config['pid'], posix_getpid());
 
         $workerClass = $this->config['class'];
         /** @var MessageWebsocketDeamonHandler $worker */
-        $worker = new $workerClass ($server, $service, $master);
+        $worker = new $workerClass ($server, $service);
 
         if (!empty($this->config['timer'])) {
             $worker->timer = $this->config['timer'];
